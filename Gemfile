@@ -29,11 +29,12 @@ group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails' # Great Expectations
-  gem 'factory_bot' # Assembly The Testing Models
+  gem 'factory_bot_rails' # Assembly The Testing Models
   gem 'shoulda-matchers', '~> 3.1' # Should Coulda Woulda
   gem 'faker' # The Fakest of the Fake
   gem 'database_cleaner' # Database Janitor
   gem 'awesome_print'
+  gem 'fuubar'
 end
 
 group :development do
