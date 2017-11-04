@@ -33,6 +33,7 @@ group :development, :test do
   gem 'shoulda-matchers', '~> 3.1' # Should Coulda Woulda
   gem 'faker' # The Fakest of the Fake
   gem 'database_cleaner' # Database Janitor
+  gem 'awesome_print'
 end
 
 group :development do
