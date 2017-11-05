@@ -18,3 +18,4 @@
 !/tmp/.keep
 /spec/examples.txt
 .byebug_history
+coverage/

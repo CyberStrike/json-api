@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe "Todos", type: :request do
+RSpec.describe 'Todos API', type: :request do
   let!(:todos) { create_list(:todo, 10) }
   let(:todo_id) { Todo.order("RANDOM()").first.id }
 
-  describe "GET /todos" do
+  describe 'GET /todos' do
     before { get todos_path }
 
     it "returns response" do
@@ -20,8 +20,12 @@ RSpec.describe "Todos", type: :request do
     before { get "/todos/#{todo_id}" }
 
     context 'when the record exists' do
-      it 'returns the todo' do
+
+      it 'returns a response' do
         expect(json).not_to be_empty
+      end
+
+      it 'returns the todo' do
         expect(json['id']).to eq(todo_id)
       end
 
@@ -45,6 +49,7 @@ RSpec.describe "Todos", type: :request do
 
   describe 'POST /todos' do
     let!(:todo_stub) { {todo: attributes_for(:todo) } }
+    let!(:invalid_todo) { { todo: { title: '', created_by: ''} } }
 
     context 'when the request is valid' do
       before do
@@ -53,6 +58,18 @@ RSpec.describe "Todos", type: :request do
 
       it 'creates a todo' do
         expect(json[:title]).to equal todo_stub[:title]
+      end
+    end
+
+    context 'validates' do
+      it 'presence of title' do
+        post '/todos', params: invalid_todo
+        expect(json['title']).to include(/can't be blank/)
+      end
+
+      it 'presence of created_by' do
+        post '/todos', params: invalid_todo
+        expect(json['created_by']).to include(/can't be blank/)
       end
     end
   end
@@ -74,16 +91,37 @@ RSpec.describe "Todos", type: :request do
       end
     end
 
-    context 'with invalid params' do
+    context 'with no params' do
       before do
-        put "/todos/#{todo_id}", params: {title: nil }
+        put "/todos/#{todo_id}", params: {}
       end
 
-      it 'renders a JSON response with errors for the todo' do
+      it 'returns status :unprocessable_entity' do
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json')
+      end
+    end
+
+    context 'when the record does not exist' do
+      let!(:invalid_todo_id) { Todo.count + 10}
+
+      before do
+        put "/todos/#{:invalid_todo_id}", params: {todo: {title: todo_stub[:title] } }
+      end
+
+      it 'returns status :not_found' do
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
 
+  describe 'DELETE /todos', :focus do
+    it 'destroys the requested todo' do
+      expect { delete "/todos/#{todo_id}" }.to change(Todo, :count).by(-1)
+    end
+
+    it 'destroys the requested todo' do
+      delete "/todos/#{todo_id}"
+      expect( response ).to have_http_status :gone
+    end
+  end
 end

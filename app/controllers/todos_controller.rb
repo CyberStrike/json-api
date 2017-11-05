@@ -35,7 +35,11 @@ class TodosController < ApplicationController
 
   # DELETE /todos/1
   def destroy
-    @todo.destroy
+    if @todo.destroy
+      render status: :gone
+    else
+      render json: @todo.errors, status: :not_found
+    end
   end
 
   private
