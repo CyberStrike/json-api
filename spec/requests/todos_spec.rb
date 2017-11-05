@@ -56,4 +56,34 @@ RSpec.describe "Todos", type: :request do
       end
     end
   end
+
+  describe 'PUT /todos' do
+    let!(:todo_stub) { attributes_for(:todo) }
+
+    context 'with valid params' do
+      before do
+        put "/todos/#{todo_id}", params: {todo: {title: todo_stub[:title] } }
+      end
+
+      it 'updates the requested todo' do
+        expect(json['title']).to eq todo_stub[:title]
+      end
+
+      it 'returns status :ok' do
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'with invalid params' do
+      before do
+        put "/todos/#{todo_id}", params: {title: nil }
+      end
+
+      it 'renders a JSON response with errors for the todo' do
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.content_type).to eq('application/json')
+      end
+    end
+  end
+
 end
