@@ -114,7 +114,7 @@ RSpec.describe 'Todos API', type: :request do
     end
   end
 
-  describe 'DELETE /todos', :focus do
+  describe 'DELETE /todos' do
     it 'destroys the requested todo' do
       expect { delete "/todos/#{todo_id}" }.to change(Todo, :count).by(-1)
     end
