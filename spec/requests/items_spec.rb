@@ -1,16 +1,20 @@
 require 'rails_helper'
 
 RSpec.describe 'Items API', type: :request do
+  let!(:todos) { create_list :todo_with_items, 10, item_count: rand(1..10) }
+  let!(:todo) { Todo.order("RANDOM()").first }
+  let(:item) { todo.items.order("RANDOM()").first }
 
-  describe 'GET /items' do
-    before { get todos_path }
+  describe 'GET /todos/:todo_id/items', :focus do
 
-    xit "returns response" do
+    before { get todo_items_path(todo) }
+
+    it "returns response" do
       expect(json).not_to be_empty
     end
 
-    xit "returns 10 todos" do
-      expect(json.size).to eq 10
+    it "returns all the todos items" do
+      expect(json.size).to eq todo.items.count
     end
   end
 
