@@ -5,76 +5,92 @@ RSpec.describe 'Items API', type: :request do
   let!(:todo) { Todo.order("RANDOM()").first }
   let(:item) { todo.items.order("RANDOM()").first }
 
-  describe 'GET /todos/:todo_id/items', :focus do
+  describe 'GET /todos/:todo_id/items' do
+    context 'when todo exists' do
+      before { get todo_items_path(todo) }
 
-    before { get todo_items_path(todo) }
+      it "returns response" do
+        expect(json).not_to be_empty
+      end
 
-    it "returns response" do
-      expect(json).not_to be_empty
+      it "returns all the todos items" do
+        expect(json.size).to eq todo.items.count
+      end
     end
 
-    it "returns all the todos items" do
-      expect(json.size).to eq todo.items.count
+    context 'when todo does not exist' do
+      before { get todo_items_path(Todo.last.id + 1) }
+
+      it 'returns status not found' do
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find Todo/)
+      end
     end
   end
 
-  # describe 'GET /todos/:id' do
-  #   before { get "/todos/#{todo_id}" }
-  #
-  #   context 'when the record exists' do
-  #
-  #     it 'returns a response' do
-  #       expect(json).not_to be_empty
-  #     end
-  #
-  #     it 'returns the todo' do
-  #       expect(json['id']).to eq(todo_id)
-  #     end
-  #
-  #     it 'returns status code 200' do
-  #       expect(response).to have_http_status(200)
-  #     end
-  #   end
-  #
-  #   context 'when the record does not exist' do
-  #     let(:todo_id) { 100 }
-  #
-  #     it 'returns status code 404' do
-  #       expect(response).to have_http_status(404)
-  #     end
-  #
-  #     it 'returns a not found message' do
-  #       expect(response.body).to match(/Couldn't find Todo/)
-  #     end
-  #   end
-  # end
-  #
-  # describe 'POST /todos' do
-  #   let!(:todo_stub) { {todo: attributes_for(:todo) } }
+  describe 'GET /todos/:id/item/:id' do
+    before { get todo_item_path(todo, item) }
+
+    context 'when item exists' do
+      before { get todo_items_path(todo) }
+
+      it "returns response" do
+        expect(json).not_to be_empty
+      end
+
+      it "returns the todo item" do
+        expect(json.size).to eq todo.items.count
+      end
+    end
+
+    context 'when item does not exist' do
+      before { get todo_items_path(Todo.last.id + 1) }
+
+      it 'returns status not found' do
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns a not found message' do
+        expect(response.body).to match(/Couldn't find Todo/)
+      end
+    end
+  end
+
+  describe 'POST /todos/:id/items' do
+    let!(:item_stub) { build :item }
   #   let!(:invalid_todo) { { todo: { title: '', created_by: ''} } }
-  #
-  #   context 'when the request is valid' do
-  #     before do
-  #       post '/todos', params: todo_stub
-  #     end
-  #
-  #     it 'creates a todo' do
-  #       expect(json[:title]).to equal todo_stub[:title]
-  #     end
-  #   end
-  #
-  #   context 'validates' do
-  #     it 'presence of title' do
-  #       post '/todos', params: invalid_todo
-  #       expect(json['title']).to include(/can't be blank/)
-  #     end
-  #
-  #     it 'presence of created_by' do
-  #       post '/todos', params: invalid_todo
-  #       expect(json['created_by']).to include(/can't be blank/)
-  #     end
-  #   end
-  # end
+
+    context 'when the request is valid' do
+      before do
+        post todo_items_path(todo), params: item_stub.as_json
+      end
+
+      it 'creates an item' do
+        # Check the system the way you would check the system
+        get todo_item_path(todo, json['id'])
+        expect(json['name']).to match item_stub[:name]
+      end
+
+      it 'returns status created' do
+        expect(response).to have_http_status(:created)
+      end
+    end
+
+    context 'validates' do
+      # it 'presence of title' do
+      #   post '/todos', params: invalid_todo
+      #   expect(json['title']).to include(/can't be blank/)
+      # end
+      #
+      # it 'presence of created_by' do
+      #   post '/todos', params: invalid_todo
+      #   expect(json['created_by']).to include(/can't be blank/)
+      # end
+    end
+  end
   #
   # describe 'PUT /todos' do
   #   let!(:todo_stub) { attributes_for(:todo) }
