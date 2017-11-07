@@ -86,55 +86,56 @@ RSpec.describe 'Items API', type: :request do
       end
     end
   end
-  #
-  # describe 'PUT /todos' do
-  #   let!(:todo_stub) { attributes_for(:todo) }
-  #
-  #   context 'with valid params' do
-  #     before do
-  #       put "/todos/#{todo_id}", params: {todo: {title: todo_stub[:title] } }
-  #     end
-  #
-  #     it 'updates the requested todo' do
-  #       expect(json['title']).to eq todo_stub[:title]
-  #     end
-  #
-  #     it 'returns status :ok' do
-  #       expect(response).to have_http_status(200)
-  #     end
-  #   end
-  #
-  #   context 'with no params' do
-  #     before do
-  #       put "/todos/#{todo_id}", params: {}
-  #     end
-  #
-  #     it 'returns status :unprocessable_entity' do
-  #       expect(response).to have_http_status(:unprocessable_entity)
-  #     end
-  #   end
-  #
-  #   context 'when the record does not exist' do
-  #     let!(:invalid_todo_id) { Todo.count + 10}
-  #
-  #     before do
-  #       put "/todos/#{:invalid_todo_id}", params: {todo: {title: todo_stub[:title] } }
-  #     end
-  #
-  #     it 'returns status :not_found' do
-  #       expect(response).to have_http_status(:not_found)
-  #     end
-  #   end
-  # end
-  #
-  # describe 'DELETE /items', :focus do
-  #   xit 'destroys the requested todo' do
-  #     expect { delete "/todos/#{todo_id}" }.to change(Todo, :count).by(-1)
-  #   end
-  #
-  #   xit 'destroys the requested todo' do
-  #     delete "/todos/#{todo_id}"
-  #     expect( response ).to have_http_status :gone
-  #   end
-  # end
+
+  describe 'PUT /todos/:id/items' do
+    let!(:item_stub) { attributes_for(:item) }
+
+    context 'with valid params' do
+      before do
+        put todo_item_path(todo, item), params: item_stub.as_json
+      end
+
+      it 'updates the requested todo' do
+        get todo_item_path(todo, json['id'])
+        expect(json['name']).to match item_stub[:name]
+      end
+
+      it 'returns status :ok' do
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'with no params' do
+      before do
+        put todo_item_path(todo, item), params: {name: ''}
+      end
+
+      it 'returns status :unprocessable_entity' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    context 'when the record does not exist' do
+      let!(:invalid_item_id) { Item.count + 10}
+
+      before do
+        put todo_item_path(todo_id: 1, id: invalid_item_id), params: {item: {name: item_stub[:name] } }
+      end
+
+      it 'returns status :not_found' do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe 'DELETE /items', :focus do
+    it 'destroys the requested item' do
+      expect {delete todo_item_path(todo, item)}.to change(Item, :count).by(-1)
+    end
+
+    it 'destroys the requested todo' do
+      delete todo_item_path(todo, item)
+      expect( response ).to have_http_status :gone
+    end
+  end
 end

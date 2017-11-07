@@ -21,6 +21,22 @@ class ItemsController < ApplicationController
     end
   end
 
+  def update
+    if @item.update(item_params)
+      render json: @item
+    else
+      render json: @item.errors, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    if @item.destroy
+      render status: :gone
+    else
+      render json: @item.errors, status: :not_found
+    end
+  end
+
   private
 
   def item_params
