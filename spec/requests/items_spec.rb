@@ -61,7 +61,7 @@ RSpec.describe 'Items API', type: :request do
 
   describe 'POST /todos/:id/items' do
     let!(:item_stub) { build :item }
-  #   let!(:invalid_todo) { { todo: { title: '', created_by: ''} } }
+    let(:invalid_item) { { item: { name: ''} } }
 
     context 'when the request is valid' do
       before do
@@ -80,15 +80,10 @@ RSpec.describe 'Items API', type: :request do
     end
 
     context 'validates' do
-      # it 'presence of title' do
-      #   post '/todos', params: invalid_todo
-      #   expect(json['title']).to include(/can't be blank/)
-      # end
-      #
-      # it 'presence of created_by' do
-      #   post '/todos', params: invalid_todo
-      #   expect(json['created_by']).to include(/can't be blank/)
-      # end
+      it 'presence of name' do
+        post todo_items_path(todo), params: invalid_item.as_json
+        expect(json['name']).to include(/can't be blank/)
+      end
     end
   end
   #

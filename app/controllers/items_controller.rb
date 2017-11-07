@@ -13,10 +13,16 @@ class ItemsController < ApplicationController
 
   def create
     @item = @todo.items.new(item_params)
-    render json: @item, status: :created if @item.save
+
+    if @item.save
+      render json: @item, status: :created
+    else
+      render json: @item.errors, status: :unprocessable_entity
+    end
   end
 
   private
+
   def item_params
     params.permit(:name, :done)
   end
