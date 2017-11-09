@@ -128,7 +128,7 @@ RSpec.describe 'Items API', type: :request do
     end
   end
 
-  describe 'DELETE /items', :focus do
+  describe 'DELETE /items' do
     it 'destroys the requested item' do
       expect {delete todo_item_path(todo, item)}.to change(Item, :count).by(-1)
     end
