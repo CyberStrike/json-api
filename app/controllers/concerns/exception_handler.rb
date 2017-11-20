@@ -12,7 +12,9 @@ module ExceptionHandler
     rescue_from ExceptionHandler::InvalidToken, with: :unprocessable_entity
     rescue_from ExceptionHandler::MissingToken, with: :unprocessable_entity
     rescue_from ExceptionHandler::ExpiredSignature, with: :unprocessable_entity
-
+    rescue_from ExceptionHandler::AuthenticationError do |error|
+      render json: { message: error.message }, status: :unauthorized
+    end
     rescue_from ActiveRecord::RecordNotFound do |e|
       render json: {message: e.message}, status: :not_found
     end

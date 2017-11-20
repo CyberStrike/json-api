@@ -1,54 +1,52 @@
 require 'rails_helper'
 
-RSpec.describe 'Authenticate', type: :service do
+RSpec.describe 'Authenticate', :focus, type: :service do
 
   # Create test user
   let(:user) { create(:user) }
   # Mock `Authorization` header
-  let(:header) { { 'Authorization' => token_generator(user.id) } }
-  # Invalid request subject
-  subject(:invalid_request) { Authenticate.new({}) }
-  # Valid request subject
-  subject (:valid_request) do
-    Authenticate.new(header)
+
+  describe '#user' do
+    context ' with valid request' do
+      xit 'returns an authentication token' do
+      end
+    end
   end
 
-  describe '#call' do
+  describe '#request' do
     # returns user object when request is valid
     context 'with valid request' do
+      let(:header) { { 'Authorization' => token_generator(user.id) } }
+
       it 'returns user object' do
-        result = valid_request.call
-        expect(result[:user]).to eq(user)
+        result = Authenticate.request(valid_headers)
+        expect(result).to eq(user)
       end
     end
 
     # returns error message when invalid request
     context 'with invalid request' do
-      context 'when missing token' do
+      let(:no_token) { { 'Authorization' => '' } }
+      let(:bad_user_token) { {'Authorization' => token_generator(5)} }
+
+      context 'is missing token' do
         it 'raises a MissingToken error' do
-          expect{ invalid_request.call }
+          expect{ Authenticate.request(no_token) }
               .to raise_error(ExceptionHandler::MissingToken, 'Missing token')
         end
       end
 
-      context 'when invalid token' do
-        subject(:invalid_request_obj) do
-          # custom helper method `token_generator`
-          Authenticate.new('Authorization' => token_generator(5))
-        end
+      context 'has an invalid token' do
+        let(:bad_request) { Authenticate.request( bad_user_token ) }
 
         it 'raises an InvalidToken error' do
-          expect { invalid_request_obj.call }
-              .to raise_error(ExceptionHandler::InvalidToken, /Invalid token/)
+          expect{ bad_request }.to raise_error(ExceptionHandler::InvalidToken, /Invalid token/)
         end
       end
 
       context 'when token is expired' do
-        let(:header) { { 'Authorization' => expired_token_generator(user.id) } }
-        subject(:request_obj) { Authenticate.new(header) }
-
         it 'raises ExceptionHandler::ExpiredSignature error' do
-          expect { request_obj.call }
+          expect{ Authenticate.request('Authorization' => expired_token_generator(user.id)) }
               .to raise_error( ExceptionHandler::ExpiredSignature, 'Signature has expired'
                   )
         end
