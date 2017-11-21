@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Authenticate', :focus, type: :service do
+RSpec.describe 'Authenticate', type: :service do
 
   # Create test user
   let(:user) { create(:user) }

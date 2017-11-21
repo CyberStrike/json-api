@@ -1,12 +1,5 @@
 class Authenticate
 
-  # Service entry point - return valid user object
-  def call
-    {
-        user: check
-    }
-  end
-
   def self.user(email, password)
     found_user = User.find_by(email: email)
     return JsonWebToken.encode(user_id: found_user.id) if found_user && found_user.authenticate(password)
@@ -20,9 +13,11 @@ class Authenticate
     raise( ExceptionHandler::InvalidToken,  ("#{I18n.t :invalid_token} #{e.message}") )
   end
 
+  private
+
   # decode authentication token
   def self.decoded_auth_token(headers = {})
-    @decoded_auth_token ||= JsonWebToken.decode(http_auth_header(headers))
+    JsonWebToken.decode(http_auth_header(headers))
   end
 
   # check for token in `Authorization` header
