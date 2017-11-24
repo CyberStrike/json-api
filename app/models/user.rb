@@ -2,7 +2,7 @@ class User < ApplicationRecord
 
   has_secure_password
 
-  has_many :todos, foreign_key: :created_by
+  has_many :todos
 
   validates :name, presence: true
   validates :email, presence: true
