@@ -35,3 +35,5 @@ en:
   invalid_credentials: 'Invalid credentials'
   invalid_token: 'Invalid token'
   missing_token: 'Missing token'
+  account_created: "Account Created"
+  valid_request: "Valid request"

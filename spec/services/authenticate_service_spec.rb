@@ -8,7 +8,7 @@ RSpec.describe 'Authenticate', type: :service do
 
   describe '#user' do
     context ' with valid request' do
-      xit 'returns an authentication token' do
+      it 'returns an authentication token' do
       end
     end
   end

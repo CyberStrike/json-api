@@ -15,14 +15,14 @@ module ExceptionHandler
     rescue_from ExceptionHandler::AuthenticationError do |error|
       render json: { message: error.message }, status: :unauthorized
     end
-    rescue_from ActiveRecord::RecordNotFound do |e|
-      render json: {message: e.message}, status: :not_found
+    rescue_from ActiveRecord::RecordNotFound do |error|
+      render json: {message: error.message}, status: :not_found
     end
   end
 
   private
 
-  def unprocessable_entity ( e )
-    render json: {message: e.message}, status: :unprocessable_entity
+  def unprocessable_entity ( error )
+    render json: {message: error.message}, status: :unprocessable_entity
   end
 end

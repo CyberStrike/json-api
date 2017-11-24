@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     resources :items
   end
 
-  post 'auth/login', to: 'authentication#login'
-
+  scope 'auth', controller: 'authentication' do
+    post 'login'; post 'register'; get 'validate'
+  end
 end

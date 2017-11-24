@@ -1,23 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe 'Authentication Endpoint', type: :request do
-  describe 'POST /auth/login' do
-    # create test user
-    let!(:user) { create(:user) }
-    let!(:user_stub) { build(:user) }
-    # set headers for authorization
-    let(:headers) { valid_headers.except('Authorization') }
-    # set test valid and invalid credentials
-    let(:valid_credentials) { { email: user.email,  password: user.password }.to_json }
-    let(:invalid_credentials) { { email: user_stub.email, password: user_stub.password_digest }.to_json }
+  let!(:user_stub) { build(:user) }
+  let!(:user) { create(:user) }
 
-    # set request.headers to our custom headers
-    # before { allow(request).to receive(:headers).and_return(headers) }
+  let(:invalid_credentials) { { email: user_stub.email, password: user_stub.password_digest }.to_json }
+  let(:valid_credentials) { {email: user.email, password: user.password} }
 
-    context 'When request is valid' do
+  let(:headers) { valid_headers.except('Authorization') }
+
+  describe 'User Login POST "/auth/login"' do
+    context 'with valid request' do
       before do
-        post '/auth/login', params: valid_credentials, headers: headers
+        post '/auth/login', params: valid_credentials.to_json, headers: headers
       end
+
+      it { is_expected.not_to be_nil }
 
       it 'returns an authentication token' do
         expect(json['token']).not_to be_nil
@@ -28,7 +26,7 @@ RSpec.describe 'Authentication Endpoint', type: :request do
       end
     end
 
-    context 'When request is invalid' do
+    context 'with valid request' do
       before { post '/auth/login', params: invalid_credentials, headers: headers }
 
       it 'returns error message "Invalid credentials"' do
@@ -37,6 +35,67 @@ RSpec.describe 'Authentication Endpoint', type: :request do
 
       it 'returns status unauthorized' do
         expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
+  describe 'User Registration POST "/auth/register"' do
+    let(:valid_credentials) { attributes_for(:user) }
+
+    context 'when valid request' do
+      before { post '/auth/register', params: valid_credentials.to_json, headers: headers }
+
+      it 'creates a new user' do
+        expect(response).to have_http_status :created
+      end
+
+      it 'returns success message' do
+        expect(json['message']).to match(/Account Created/)
+      end
+
+      it 'returns a valid authentication token' do
+        # Normally we wouldn't need to use a tool the user doesn't have access to
+        # in an acceptance test but due to the nature of encrypted tokens we have to verify
+        # we are being a sent a valid key.
+
+        expect{ JsonWebToken.decode(json['token']) }.not_to raise_error
+      end
+    end
+
+    context 'when invalid request' do
+      before { post '/auth/register', params: {}, headers: headers }
+
+      it 'does not create a new user' do
+        expect(response).to have_http_status(422)
+      end
+
+      it 'returns failure message' do
+        expect(json['message']).to match(/Validation failed: Password can't be blank, Name can't be blank, Email can't be blank, Password digest can't be blank/)
+      end
+    end
+  end
+
+  describe 'User request validation GET "/auth/validate"' do
+    let(:headers) { valid_headers }
+    let(:invalid_headers) { valid_headers.except('Authorization') }
+
+    context 'with valid request' do
+      before { get '/auth/validate', params: valid_credentials.to_json, headers: headers }
+
+      it 'returns a success status' do
+        expect(response).to have_http_status :accepted
+      end
+
+      it 'returns message "Valid request"' do
+        expect(json['message']).to match(/Valid request/)
+      end
+    end
+
+    context 'with invalid request' do
+      before { get '/auth/validate', params: valid_credentials.to_json, headers: invalid_headers }
+
+      it 'returns a failure status' do
+        expect(response).to have_http_status :unprocessable_entity
       end
     end
   end

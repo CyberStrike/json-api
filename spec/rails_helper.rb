@@ -56,7 +56,6 @@ RSpec.configure do |config|
 
   # add `FactoryGirl` methods
   config.include FactoryBot::Syntax::Methods
-
   config.include RequestSpecHelper
   config.include AuthenticateSpecHelper
 
