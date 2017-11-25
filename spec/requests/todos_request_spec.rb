@@ -64,17 +64,14 @@ RSpec.describe 'Todos API', type: :request do
     end
   end
 
-  describe 'POST /todos' do
+  describe 'POST /todos', :focus do
     let!(:todo_stub) { attributes_for(:todo) }
     let!(:invalid_todo) { { todo: { title: '', created_by: ''} } }
 
     context 'when the request is valid' do
-      before do
-        post '/todos', params: todo_stub.to_json, headers: valid_headers
-      end
-
-      it 'creates a todo' do
-        expect(json['title']).to eq todo_stub[:title]
+      it 'creates a todo belonging to the user' do
+        expect{ post '/todos', params: todo_stub.to_json, headers: valid_headers }
+        .to change{ fetch_todos.count }.by(1)
       end
     end
 

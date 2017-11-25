@@ -4,7 +4,6 @@ class TodosController < ApplicationController
   # GET /todos
   def index
     @todos = @current_user.todos.all
-
     render json: @todos
   end
 
@@ -15,7 +14,8 @@ class TodosController < ApplicationController
 
   # POST /todos
   def create
-    @todo = Todo.new(todo_params.merge(user: User.order("RANDOM()").first))
+    # Purposely passing the test in the wrong way here.
+    @todo = @current_user.todos.new( todo_params )
 
     if @todo.save
       render json: @todo, status: :created, location: @todo
