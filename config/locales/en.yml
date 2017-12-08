@@ -37,3 +37,4 @@ en:
   missing_token: 'Missing token'
   account_created: "Account Created"
   valid_request: "Valid request"
+  unauthorized: "Unauthorized"

@@ -35,6 +35,7 @@ group :development, :test do
   gem 'database_cleaner' # Database Janitor
   gem 'awesome_print'
   gem 'fuubar'
+  gem 'irbtools', require: 'irbtools/binding'
 end
 
 group :development do

@@ -16,7 +16,10 @@ module ExceptionHandler
       render json: { message: error.message }, status: :unauthorized
     end
     rescue_from ActiveRecord::RecordNotFound do |error|
-      render json: {message: error.message}, status: :not_found
+      # The Default message isn't pretty..
+      # "Couldn't find Item with [WHERE \"items\".\"todo_id\" = ? AND \"items\".\"id\" = ?]"
+      # So we return a nicer one instead.
+      render json: {message: 'Record not found.'}, status: :not_found
     end
   end
 

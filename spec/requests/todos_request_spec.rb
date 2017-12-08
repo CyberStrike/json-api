@@ -64,7 +64,7 @@ RSpec.describe 'Todos API', type: :request do
     end
   end
 
-  describe 'POST /todos', :focus do
+  describe 'POST /todos' do
     let!(:todo_stub) { attributes_for(:todo) }
     let!(:invalid_todo) { { todo: { title: '', created_by: ''} } }
 

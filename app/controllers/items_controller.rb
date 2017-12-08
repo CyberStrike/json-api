@@ -44,7 +44,18 @@ class ItemsController < ApplicationController
   end
 
   def set_todo
-    @todo = Todo.find(params[:todo_id])
+
+    # Not sure if code or security smell
+    # I have feeling that if I dump the memory I will see the record
+    # regardless of the user check. Maybe better to not load it at all?
+    # @todo = @current_user.todos.find(params[:todo_id])
+    #
+    todo = Todo.find(params[:todo_id])
+    if todo.user == @current_user
+      @todo = todo
+    else
+      raise ExceptionHandler::AuthenticationError, I18n.t(:unauthorized)
+    end
   end
 
   def set_todo_item
