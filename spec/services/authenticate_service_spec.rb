@@ -7,17 +7,14 @@ RSpec.describe 'Authenticate', type: :service do
   # Mock `Authorization` header
 
   describe '#user' do
-    context ' with valid request' do
-      it 'returns an authentication token' do
-      end
+    context 'with valid request' do
+      it 'returns an authentication token'
     end
   end
 
   describe '#request' do
     # returns user object when request is valid
     context 'with valid request' do
-      let(:header) { { 'Authorization' => token_generator(user.id) } }
-
       it 'returns user object' do
         result = Authenticate.request(valid_headers)
         expect(result).to eq(user)
@@ -26,8 +23,8 @@ RSpec.describe 'Authenticate', type: :service do
 
     # returns error message when invalid request
     context 'with invalid request' do
-      let(:no_token) { { 'Authorization' => '' } }
-      let(:bad_user_token) { {'Authorization' => token_generator(5)} }
+      let(:no_token) { { 'Authorization' => 'Bearer' } }
+      let(:bad_user_token) { valid_headers(5) }
 
       context 'is missing token' do
         it 'raises a MissingToken error' do
@@ -36,7 +33,7 @@ RSpec.describe 'Authenticate', type: :service do
         end
       end
 
-      context 'has an invalid token' do
+      context 'using an invalid token' do
         let(:bad_request) { Authenticate.request( bad_user_token ) }
 
         it 'raises an InvalidToken error' do
@@ -46,7 +43,7 @@ RSpec.describe 'Authenticate', type: :service do
 
       context 'when token is expired' do
         it 'raises ExceptionHandler::ExpiredSignature error' do
-          expect{ Authenticate.request('Authorization' => expired_token_generator(user.id)) }
+          expect{ Authenticate.request('Authorization' => "Bearer #{expired_token_generator(user.id)}")}
               .to raise_error( ExceptionHandler::ExpiredSignature, 'Signature has expired'
                   )
         end

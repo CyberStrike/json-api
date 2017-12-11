@@ -19,7 +19,7 @@ module ExceptionHandler
       # The Default message isn't pretty..
       # "Couldn't find Item with [WHERE \"items\".\"todo_id\" = ? AND \"items\".\"id\" = ?]"
       # So we return a nicer one instead.
-      render json: {message: 'Record not found.'}, status: :not_found
+      render json: {message: "Couldn't find record with ID #{error.id}"}, status: :not_found
     end
   end
 

@@ -9,19 +9,17 @@ module AuthenticateSpecHelper
     JsonWebToken.encode({ user_id: user_id }, (Time.now.to_i - 10))
   end
 
-  # return valid headers
   def valid_headers(id = user.id)
     {
-        'Authorization' => token_generator(id),
-        'Content-Type' => 'application/json'
+      'Authorization' => "Bearer #{token_generator(id)}",
+      'Content-Type' => 'application/json'
     }
   end
 
-  # return invalid headers
   def invalid_headers
     {
-        'Authorization' => nil,
-        'Content-Type' => 'application/json'
+      'Authorization' => "Bearer",
+      'Content-Type' => 'application/json'
     }
   end
 

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'Todos API', type: :request do
+RSpec.describe "Todo's API", type: :request do
   let!(:user ) { create :user }
   let!(:luigi ) { create :user }
 
@@ -50,7 +50,7 @@ RSpec.describe 'Todos API', type: :request do
       end
 
       it 'returns a not found message' do
-        expect(response.body).to match(/Couldn't find Todo/)
+        expect(response.body).to match(/Couldn't find record/)
       end
     end
 

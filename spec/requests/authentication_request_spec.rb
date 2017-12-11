@@ -58,7 +58,21 @@ RSpec.describe 'Authentication Endpoint', type: :request do
         # in an acceptance test but due to the nature of encrypted tokens we have to verify
         # we are being a sent a valid key.
 
+        # Maybe try to validate a request with the returned key on another end point?
+
         expect{ JsonWebToken.decode(json['token']) }.not_to raise_error
+      end
+
+      context 'cannot register the same email twice' do
+        before { post '/auth/register', params: valid_credentials.to_json, headers: headers }
+
+        it 'returns error message' do
+          expect(json['message']).to match /Email has already been taken/
+        end
+
+        it 'responds with a status of :unprocessable_entity' do
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
       end
     end
 

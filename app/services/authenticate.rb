@@ -25,10 +25,15 @@ class Authenticate
 
   # check for token in `Authorization` header
   def self.http_auth_header(headers = {})
-    if headers['Authorization'].present? and not headers['Authorization'].blank?
+    has_auth_header = (headers['Authorization'].present? and not headers['Authorization'].blank?)
+    has_valid_format = (headers['Authorization'].include?('Bearer') and headers['Authorization'].split(' ').count == 2)
+
+    if has_auth_header and has_valid_format
       return headers['Authorization'].split(' ').last
     end
 
+    raise(ExceptionHandler::MissingToken, I18n.t(:missing_token))
+  rescue NoMethodError => e
     raise(ExceptionHandler::MissingToken, I18n.t(:missing_token))
   end
 end
