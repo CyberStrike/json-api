@@ -26,7 +26,7 @@ RSpec.describe 'Authentication Endpoint', type: :request do
       end
     end
 
-    context 'with valid request' do
+    context 'with invalid request' do
       before { post '/auth/login', params: invalid_credentials, headers: headers }
 
       it 'returns error message "Invalid credentials"' do
@@ -43,7 +43,7 @@ RSpec.describe 'Authentication Endpoint', type: :request do
     let(:valid_credentials) { attributes_for(:user) }
 
     context 'when valid request' do
-      before { post '/auth/register', params: valid_credentials.to_json, headers: headers }
+      before { post '/auth/register', params: valid_credentials.as_json }
 
       it 'creates a new user' do
         expect(response).to have_http_status :created
@@ -64,7 +64,7 @@ RSpec.describe 'Authentication Endpoint', type: :request do
       end
 
       context 'cannot register the same email twice' do
-        before { post '/auth/register', params: valid_credentials.to_json, headers: headers }
+        before { post '/auth/register', params: valid_credentials.as_json }
 
         it 'returns error message' do
           expect(json['message']).to match /Email has already been taken/
